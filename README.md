@@ -1,4 +1,4 @@
-#写真整理ツール「photo_organizer」
+# 写真整理ツール「photo_organizer」
 
 EXIF情報を取得し、
 撮影日とカメラの機種名を元に写真を整理するmac用のワークフローです。
