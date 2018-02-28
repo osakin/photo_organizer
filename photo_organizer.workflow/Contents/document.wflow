@@ -59,7 +59,9 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>COMMAND_STRING</key>
-					<string>/usr/local/bin/exiftool -j "$@"  2&gt;/dev/null</string>
+					<string>mkdir -p /tmp/photo_organizer
+log_file_base="/tmp/photo_organizer/"$(date "+%Y%m%d-%H%M%S")
+/usr/local/bin/exiftool -j "$@"  2&gt; ${log_file_base}_err.log | tee -a ${log_file_base}.log</string>
 					<key>CheckedForUserDefaultShell</key>
 					<true/>
 					<key>inputMethod</key>
@@ -172,7 +174,7 @@
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>379.500000:253.000000</string>
+				<string>566.500000:530.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/Japanese.lproj/main.nib</string>
 			</dict>
@@ -251,7 +253,7 @@ DEFAULT_FILENAME_FORMAT = (
 def parse_datetime(createdate):
     """CreatedDateを扱いやすい形に分解する."""
     try:
-        cdt = datetime.strptime(createdate, '%Y:%m:%d %H:%M:%S')
+        cdt = datetime.strptime(createdate[:19], '%Y:%m:%d %H:%M:%S')
         return dict(
             y=cdt.strftime('%Y'),
             m=cdt.strftime('%m'),
@@ -318,7 +320,12 @@ def copy_outbox(photo):
         k: v.replace(' ', '_') if isinstance(v, basestring) else v
         for k, v in photo.items()
     })
-    photo_info.update(parse_datetime(photo.get('CreateDate')))
+    photo_info.update(parse_datetime(
+        photo.get('CreateDate') or
+        photo.get('DateCreated') or
+        photo.get('DateTimeOriginal') or
+        photo.get('FileModifyDate')
+    ))
 
     photo_info['bn'] = branch_no(
         output_base_path, filename_format, photo_info)
@@ -339,7 +346,8 @@ def main(input_json):
     """exiftoolが出力するJSONファイルの属性から写真を整理する"""
     photos = json.loads(input_json)
     for photo in photos:
-        copy_outbox(photo)
+        if 'Error' not in photo:
+            copy_outbox(photo)
 
 
 if __name__ == '__main__':
@@ -458,7 +466,7 @@ if __name__ == '__main__':
 				<key>isViewVisible</key>
 				<true/>
 				<key>location</key>
-				<string>379.500000:822.000000</string>
+				<string>566.500000:1338.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/Japanese.lproj/main.nib</string>
 			</dict>
@@ -468,7 +476,7 @@ if __name__ == '__main__':
 	</array>
 	<key>connectors</key>
 	<dict>
-		<key>1042E0E2-C63F-4FD4-89CF-56286ED29B31</key>
+		<key>ACC6D142-7174-4699-95F3-C38D8FDCCC69</key>
 		<dict>
 			<key>from</key>
 			<string>562F5C45-938C-4D9A-9A9E-78C619965B8F - 562F5C45-938C-4D9A-9A9E-78C619965B8F</string>
